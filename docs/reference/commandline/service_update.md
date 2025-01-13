@@ -7,6 +7,7 @@ Update a service
 
 | Name                                          | Type              | Default | Description                                                                                         |
 |:----------------------------------------------|:------------------|:--------|:----------------------------------------------------------------------------------------------------|
+| `--apparmor`                                  | `string`          |         | AppArmor mode (`default` or `disabled`                                                              |
 | `--args`                                      | `command`         |         | Service command args                                                                                |
 | `--cap-add`                                   | `list`            |         | Add Linux capabilities                                                                              |
 | `--cap-drop`                                  | `list`            |         | Drop Linux capabilities                                                                             |
@@ -57,8 +58,9 @@ Update a service
 | `--mount-rm`                                  | `list`            |         | Remove a mount by its target path                                                                   |
 | [`--network-add`](#network-add)               | `network`         |         | Add a network                                                                                       |
 | `--network-rm`                                | `list`            |         | Remove a network                                                                                    |
-| `--no-healthcheck`                            |                   |         | Disable any container-specified HEALTHCHECK                                                         |
-| `--no-resolve-image`                          |                   |         | Do not query the registry to resolve image digest and supported platforms                           |
+| `--no-healthcheck`                            | `bool`            |         | Disable any container-specified HEALTHCHECK                                                         |
+| `--no-new-privileges`                         | `bool`            |         | Disable container processes from gaining new privileges                                             |
+| `--no-resolve-image`                          | `bool`            |         | Do not query the registry to resolve image digest and supported platforms                           |
 | `--placement-pref-add`                        | `pref`            |         | Add a placement preference                                                                          |
 | `--placement-pref-rm`                         | `pref`            |         | Remove a placement preference                                                                       |
 | [`--publish-add`](#publish-add)               | `port`            |         | Add or update a published port                                                                      |
@@ -80,6 +82,7 @@ Update a service
 | `--rollback-monitor`                          | `duration`        | `0s`    | Duration after each task rollback to monitor for failure (ns\|us\|ms\|s\|m\|h)                      |
 | `--rollback-order`                            | `string`          |         | Rollback order (`start-first`, `stop-first`)                                                        |
 | `--rollback-parallelism`                      | `uint64`          | `0`     | Maximum number of tasks rolled back simultaneously (0 to roll back all at once)                     |
+| `--seccomp`                                   | `string`          |         | Seccomp configuration (`default`, `unconfined`, or a path to a json custom seccomp profile)         |
 | [`--secret-add`](#secret-add)                 | `secret`          |         | Add or update a secret on a service                                                                 |
 | `--secret-rm`                                 | `list`            |         | Remove a secret                                                                                     |
 | `--stop-grace-period`                         | `duration`        |         | Time to wait before force killing a container (ns\|us\|ms\|s\|m\|h)                                 |

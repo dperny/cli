@@ -7,6 +7,7 @@ Create a new service
 
 | Name                                                | Type              | Default      | Description                                                                                         |
 |:----------------------------------------------------|:------------------|:-------------|:----------------------------------------------------------------------------------------------------|
+| `--apparmor`                                        | `string`          |              | AppArmor mode (`default` or `disabled`                                                              |
 | `--cap-add`                                         | `list`            |              | Add Linux capabilities                                                                              |
 | `--cap-drop`                                        | `list`            |              | Drop Linux capabilities                                                                             |
 | [`--config`](#config)                               | `config`          |              | Specify configurations to expose to the service                                                     |
@@ -44,8 +45,9 @@ Create a new service
 | [`--mount`](#mount)                                 | `mount`           |              | Attach a filesystem mount to the service                                                            |
 | `--name`                                            | `string`          |              | Service name                                                                                        |
 | [`--network`](#network)                             | `network`         |              | Network attachments                                                                                 |
-| `--no-healthcheck`                                  |                   |              | Disable any container-specified HEALTHCHECK                                                         |
-| `--no-resolve-image`                                |                   |              | Do not query the registry to resolve image digest and supported platforms                           |
+| `--no-healthcheck`                                  | `bool`            |              | Disable any container-specified HEALTHCHECK                                                         |
+| `--no-new-privileges`                               | `bool`            |              | Disable container processes from gaining new privileges                                             |
+| `--no-resolve-image`                                | `bool`            |              | Do not query the registry to resolve image digest and supported platforms                           |
 | [`--placement-pref`](#placement-pref)               | `pref`            |              | Add a placement preference                                                                          |
 | [`-p`](#publish), [`--publish`](#publish)           | `port`            |              | Publish a port as a node port                                                                       |
 | `-q`, `--quiet`                                     |                   |              | Suppress progress output                                                                            |
@@ -64,6 +66,7 @@ Create a new service
 | `--rollback-monitor`                                | `duration`        | `0s`         | Duration after each task rollback to monitor for failure (ns\|us\|ms\|s\|m\|h) (default 5s)         |
 | `--rollback-order`                                  | `string`          |              | Rollback order (`start-first`, `stop-first`) (default `stop-first`)                                 |
 | `--rollback-parallelism`                            | `uint64`          | `1`          | Maximum number of tasks rolled back simultaneously (0 to roll back all at once)                     |
+| `--seccomp`                                         | `string`          |              | Seccomp configuration (`default`, `unconfined`, or a path to a json custom seccomp profile)         |
 | [`--secret`](#secret)                               | `secret`          |              | Specify secrets to expose to the service                                                            |
 | `--stop-grace-period`                               | `duration`        |              | Time to wait before force killing a container (ns\|us\|ms\|s\|m\|h) (default 10s)                   |
 | `--stop-signal`                                     | `string`          |              | Signal to stop the container                                                                        |
