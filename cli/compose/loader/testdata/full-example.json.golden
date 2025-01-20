@@ -434,7 +434,10 @@
       ],
       "security_opt": [
         "label=level:s0:c100,c200",
-        "label=type:svirt_apache_t"
+        "label=type:svirt_apache_t",
+        "apparmor=disabled",
+        "seccomp=unconfined",
+        "no-new-privileges"
       ],
       "stdin_open": true,
       "stop_grace_period": "20s",

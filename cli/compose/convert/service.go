@@ -2,6 +2,8 @@ package convert
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -102,6 +104,68 @@ func Service(
 	privileges.CredentialSpec, err = convertCredentialSpec(
 		namespace, service.CredentialSpec, configs,
 	)
+
+	// store the values of seccomp and apparmor here. then, attempt to match
+	// the behavior of stand-alone compose.
+	var (
+		seccomp  string
+		apparmor string
+	)
+	// parse out apparmor and seccomp from security_opt, which is a []string
+	for _, opt := range service.SecurityOpt {
+		con := strings.SplitN(opt, "=", 2)
+		if len(con) == 1 && con[0] != "no-new-privileges" {
+			if strings.Contains(opt, ":") {
+				con = strings.SplitN(opt, ":", 2)
+			} else {
+				return swarm.ServiceSpec{}, fmt.Errorf("Invalid security_opt: %q", opt)
+			}
+		}
+		switch con[0] {
+		case "seccomp":
+			if con[1] != "unconfined" && con[1] != "default" {
+				f, err := os.ReadFile(con[1])
+				if err != nil {
+					return swarm.ServiceSpec{}, fmt.Errorf("opening seccomp profile (%sa) failed: %w", con[1], err)
+				}
+				// don't bother compacting json like containers does.
+				seccomp = string(f)
+			} else {
+				seccomp = con[1]
+			}
+		case "apparmor":
+			apparmor = con[1]
+		case "no-new-privileges":
+			if len(con) > 1 {
+				return swarm.ServiceSpec{}, fmt.Errorf("no-new-privileges security_opt does not take arguments")
+			}
+			privileges.NoNewPrivileges = true
+		}
+		// Should always have key and value separated by =. The key should
+		// be one of these known supported options
+	}
+
+	switch apparmor {
+	case string(swarm.AppArmorModeDefault):
+		privileges.AppArmor = &swarm.AppArmorOpts{Mode: swarm.AppArmorModeDefault}
+	case string(swarm.AppArmorModeDisabled):
+		privileges.AppArmor = &swarm.AppArmorOpts{Mode: swarm.AppArmorModeDisabled}
+	}
+
+	switch seccomp {
+	case string(swarm.SeccompModeDefault):
+		privileges.Seccomp = &swarm.SeccompOpts{Mode: swarm.SeccompModeDefault}
+	case string(swarm.SeccompModeUnconfined):
+		privileges.Seccomp = &swarm.SeccompOpts{Mode: swarm.SeccompModeUnconfined}
+	default:
+		if json.Valid([]byte(seccomp)) {
+			privileges.Seccomp = &swarm.SeccompOpts{
+				Mode:    swarm.SeccompModeCustom,
+				Profile: []byte(seccomp),
+			}
+		}
+	}
+
 	if err != nil {
 		return swarm.ServiceSpec{}, err
 	}

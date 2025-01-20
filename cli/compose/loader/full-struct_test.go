@@ -350,6 +350,9 @@ func services(workingDir, homeDir string) []types.ServiceConfig {
 			SecurityOpt: []string{
 				"label=level:s0:c100,c200",
 				"label=type:svirt_apache_t",
+				"apparmor=disabled",
+				"seccomp=unconfined",
+				"no-new-privileges",
 			},
 			StdinOpen:       true,
 			StopSignal:      "SIGUSR1",

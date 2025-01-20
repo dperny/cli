@@ -25,7 +25,6 @@ var UnsupportedProperties = []string{
 	"pid",
 	"privileged",
 	"restart",
-	"security_opt",
 	"shm_size",
 	"userns_mode",
 }

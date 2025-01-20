@@ -683,3 +683,54 @@ func TestConvertServiceCapAddAndCapDrop(t *testing.T) {
 		})
 	}
 }
+
+func TestConvertPrivileges(t *testing.T) {
+	config := composetypes.ServiceConfig{
+		SecurityOpt: []string{
+			"apparmor=disabled",
+			"seccomp=unconfined",
+			"no-new-privileges",
+		},
+	}
+
+	result, err := Service("1.42", Namespace{name: "foo"}, config, nil, nil, nil, nil)
+	assert.NilError(t, err)
+	assert.Check(t, result.TaskTemplate.ContainerSpec.Privileges != nil)
+	assert.Check(t, is.DeepEqual(
+		result.TaskTemplate.ContainerSpec.Privileges.AppArmor,
+		&swarm.AppArmorOpts{
+			Mode: swarm.AppArmorModeDisabled,
+		},
+	))
+	assert.Check(t, is.DeepEqual(
+		result.TaskTemplate.ContainerSpec.Privileges.Seccomp,
+		&swarm.SeccompOpts{
+			Mode: swarm.SeccompModeUnconfined,
+		},
+	))
+
+	assert.Check(t, result.TaskTemplate.ContainerSpec.Privileges.NoNewPrivileges)
+}
+
+func TestConvertCustomSeccomp(t *testing.T) {
+	config := composetypes.ServiceConfig{
+		// what could go wrong
+		SecurityOpt: []string{
+			"seccomp=../../command/service/testdata/test-seccomp-valid.json",
+		},
+	}
+
+	result, err := Service("1.42", Namespace{name: "foo"}, config, nil, nil, nil, nil)
+	assert.NilError(t, err)
+	assert.Check(t, result.TaskTemplate.ContainerSpec.Privileges != nil)
+	assert.Check(t, is.DeepEqual(
+		result.TaskTemplate.ContainerSpec.Privileges.Seccomp,
+		&swarm.SeccompOpts{
+			Mode: swarm.SeccompModeCustom,
+			Profile: []byte(`{
+  "json": "you betcha"
+}
+`),
+		},
+	))
+}
